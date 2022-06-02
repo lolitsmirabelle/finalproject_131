@@ -101,3 +101,21 @@ I made `endangered`, `specie`, and `sub_specie` into factors to categorize the d
 
 # Exploratory Data Analysis (EDA)
 
+## Let's explore the different variables and visualize the different distributions of the features.
+
+```{r}
+sloths %>% 
+  ggplot(aes(x = claw_length_cm)) +
+  geom_histogram(bins = 60) +
+  theme_bw()
+```
+
+From the graph above, we can observe that the distribution of the sloth claw lengths closely follows a normal distribution.
+
+```{r}
+sloths %>% 
+  ggplot(aes(x = tail_length_cm)) +
+  geom_histogram(bins = 60) +
+  theme_bw()
+```
+

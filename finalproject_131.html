@@ -418,7 +418,7 @@ three toed.</li>
 </div>
 <div id="overview-of-dataset" class="section level1">
 <h1>Overview of Dataset</h1>
-<p>Let’s begin by exploring the dataset and load all of the data and
+<p>Let’s begin by exploring the dataset and loading all of the data and
 necessary packages.</p>
 <pre class="r"><code># Loading the data
 sloths &lt;- read.csv(&quot;/Users/mirabellele/Desktop/finalproject_131/sloth_data.csv&quot;) 
@@ -463,12 +463,27 @@ cm</li>
 <li><code>weight_kg</code> : The weight of the sloth in kg</li>
 </ul>
 </div>
-<div id="data-cleaning" class="section level2">
-<h2>Data Cleaning</h2>
-<pre class="r"><code>sloths &lt;- sloths %&gt;% 
-  clean_names() %&gt;%
-  select(-x) # removing the x column that contains the index for each sloth -&gt; was misleading since it started at 0</code></pre>
 </div>
+<div id="data-cleaning" class="section level1">
+<h1>Data Cleaning</h1>
+<pre class="r"><code># cleaning and deselecting variables
+sloths &lt;- sloths %&gt;% 
+  clean_names() %&gt;%
+  select(-x) </code></pre>
+<p>I ended up removing the x column that contains the index for each
+sloth since I thought it was misleading since it started at 0 and ended
+at 4999 I believed it was unnecessary to include in my data.</p>
+<pre class="r"><code># Factoring variables
+sloths$endangered &lt;- factor(sloths$endangered)
+sloths$specie &lt;- factor(sloths$specie)
+sloths$sub_specie &lt;- factor(sloths$sub_specie)</code></pre>
+<p>I made <code>endangered</code>, <code>specie</code>, and
+<code>sub_specie</code> into factors to categorize the data and stored
+it as levels. I believe that it would be useful in data analysis for
+statistical modeling.</p>
+</div>
+<div id="exploratory-data-analysis-eda" class="section level1">
+<h1>Exploratory Data Analysis (EDA)</h1>
 </div>
 
 

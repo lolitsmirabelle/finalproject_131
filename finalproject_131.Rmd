@@ -32,9 +32,10 @@ Here are a few cute pictures of sloths!
 1. Clean the data and visualize the distribution of the features.
 2. Create a classification model to predict if a sloth is two toed or three toed.
 
+
 # Overview of Dataset
 
-Let's begin by exploring the dataset and load all of the data and necessary packages.
+Let's begin by exploring the dataset and loading all of the data and necessary packages.
 
 ```{r, include=FALSE}
 # Loading packages
@@ -62,7 +63,7 @@ sloths <- read.csv("/Users/mirabellele/Desktop/finalproject_131/sloth_data.csv")
 head(sloths)
 ```
 
-In this data set, our dataset contains 5000 observations and 7 predictors.The dataset includes information on the sizes of sloths, with each row being a different observed sloth. The variables include the claw length, the endangered category for the sloth, what species the sloth is, what subspecies the sloth is, its size, tail length, and weight. In addition, there is a column for the index of each sloth beginning at 0 and ending at 4999 (which I removed later on).
+In this data set, our dataset contains 5000 observations and 7 predictors. The dataset includes information on the sizes of sloths, with each row being a different observed sloth. The variables include the claw length, the endangered category for the sloth, what species the sloth is, what subspecies the sloth is, its size, tail length, and weight. In addition, there is a column for the index of each sloth beginning at 0 and ending at 4999 (which I removed later on).
 
 The link to the dataset can be found here: https://www.kaggle.com/datasets/bertiemackie/sloth-species . 
 
@@ -77,11 +78,26 @@ The link to the dataset can be found here: https://www.kaggle.com/datasets/berti
 * `tail_length_cm` : The length of the sloths tail in cm
 * `weight_kg` : The weight of the sloth in kg
 
-## Data Cleaning
+
+# Data Cleaning
 
 ```{r}
+# cleaning and deselecting variables
 sloths <- sloths %>% 
   clean_names() %>%
-  select(-x) # removing the x column that contains the index for each sloth -> was misleading since it started at 0
+  select(-x) 
 ```
+
+I ended up removing the x column that contains the index for each sloth since I thought it was misleading since it started at 0 and ended at 4999 I believed it was unnecessary to include in my data. 
+
+```{r}
+# Factoring variables
+sloths$endangered <- factor(sloths$endangered)
+sloths$specie <- factor(sloths$specie)
+sloths$sub_specie <- factor(sloths$sub_specie)
+```
+
+I made `endangered`, `specie`, and `sub_specie` into factors to categorize the data and stored it as levels. I believe that it would be useful in data analysis for statistical modeling.
+
+# Exploratory Data Analysis (EDA)
 

@@ -15,7 +15,17 @@ The goal of this project is to generate a model that will predict if a sloth is 
 
 ## All Things Sloths!
 
-If you don't know what sloths are, they are an adorable species of animals well known for being slow and lethargic. These creatures spend a majority of their lives hanging on trees, sleeping, and remaining hidden from predators. The animals live solitary lives and travel from tree to tree using canopy vines. Located in places such as Brazil and Panama, this strange and wonderful animal needs healthy forests to survive. 
+If you don't know what sloths are, they are an adorable species of animals well known for being slow and lethargic. These creatures spend a majority of their lives hanging on trees, sleeping, and remaining hidden from predators. The animals live solitary lives and travel from tree to tree using canopy vines. Located in places such as Brazil and Panama, this strange and wonderful animal needs healthy forests to survive. (Source: https://www.worldwildlife.org/stories/why-are-sloths-slow-and-six-other-sloth-facts)
+
+There are two main species of sloth, identified by whether they have two or three claws on their front feet. The two species are quite similar in appearance, with roundish heads, sad-looking eyes, tiny ears, and stubby tails. Two-toed sloths are slightly bigger and tend to spend more time hanging upside-down than their three-toed cousins, who will often sit upright in the fork of a tree branch. Three-toed sloths have facial coloring that makes them look like they're always smiling. They also have two extra neck vertebrae that allow them to turn their heads almost all the way around! (Source: https://kids.nationalgeographic.com/animals/mammals/facts/sloth)
+
+Here are a few cute pictures of sloths!
+
+![A cute sloth!](/Users/mirabellele/Desktop/finalproject_131/sloth1.jpeg)
+
+![A sloth hanging eating fruits!](/Users/mirabellele/Desktop/finalproject_131/sloth2.jpeg)
+
+![A little sloth hanging on a branch!](/Users/mirabellele/Desktop/finalproject_131/sloth3.jpeg)
 
 ## Including Plots
 

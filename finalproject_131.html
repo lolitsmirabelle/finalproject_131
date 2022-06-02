@@ -420,64 +420,6 @@ three toed.</li>
 <h1>Overview of Dataset</h1>
 <p>Let’s begin by exploring the dataset and load all of the data and
 necessary packages.</p>
-<pre class="r"><code># Loading packages
-library(tidymodels)</code></pre>
-<pre><code>## ── Attaching packages ────────────────────────────────────── tidymodels 0.2.0 ──</code></pre>
-<pre><code>## ✓ broom        0.7.12     ✓ recipes      0.2.0 
-## ✓ dials        0.1.0      ✓ rsample      0.1.1 
-## ✓ dplyr        1.0.8      ✓ tibble       3.1.6 
-## ✓ ggplot2      3.3.5      ✓ tidyr        1.2.0 
-## ✓ infer        1.0.0      ✓ tune         0.2.0 
-## ✓ modeldata    0.1.1      ✓ workflows    0.2.6 
-## ✓ parsnip      0.2.1      ✓ workflowsets 0.2.1 
-## ✓ purrr        0.3.4      ✓ yardstick    0.0.9</code></pre>
-<pre><code>## ── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
-## x purrr::discard() masks scales::discard()
-## x dplyr::filter()  masks stats::filter()
-## x dplyr::lag()     masks stats::lag()
-## x recipes::step()  masks stats::step()
-## • Use tidymodels_prefer() to resolve common conflicts.</code></pre>
-<pre class="r"><code>library(ISLR) 
-library(ISLR2) </code></pre>
-<pre><code>## 
-## Attaching package: &#39;ISLR2&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:ISLR&#39;:
-## 
-##     Auto, Credit</code></pre>
-<pre class="r"><code>library(ggplot2)
-library(discrim)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;discrim&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:dials&#39;:
-## 
-##     smoothness</code></pre>
-<pre class="r"><code>library(poissonreg)
-library(corrr)
-library(klaR) # for naive bayes</code></pre>
-<pre><code>## Loading required package: MASS</code></pre>
-<pre><code>## 
-## Attaching package: &#39;MASS&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:ISLR2&#39;:
-## 
-##     Boston</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     select</code></pre>
-<pre class="r"><code>tidymodels_prefer()
-library(rpart.plot)</code></pre>
-<pre><code>## Loading required package: rpart</code></pre>
-<pre><code>## 
-## Attaching package: &#39;rpart&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:dials&#39;:
-## 
-##     prune</code></pre>
-<pre class="r"><code>library(vip)
-library(janitor)
-library(randomForest)</code></pre>
-<pre><code>## randomForest 4.7-1</code></pre>
-<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
-<pre class="r"><code>library(xgboost)
-library(ranger)</code></pre>
 <pre class="r"><code># Loading the data
 sloths &lt;- read.csv(&quot;/Users/mirabellele/Desktop/finalproject_131/sloth_data.csv&quot;) 
 head(sloths)</code></pre>
@@ -495,17 +437,19 @@ head(sloths)</code></pre>
 ## 4 Pygmy three-toed sloth          6.983     2.392
 ## 5 Pygmy three-toed sloth          5.411     3.163
 ## 6 Pygmy three-toed sloth          3.672     3.305</code></pre>
-<p>In this data set, our dataset contains 4999 observations and 7
+<p>In this data set, our dataset contains 5000 observations and 7
 predictors.The dataset includes information on the sizes of sloths, with
 each row being a different observed sloth. The variables include the
 claw length, the endangered category for the sloth, what species the
 sloth is, what subspecies the sloth is, its size, tail length, and
-weight.</p>
+weight. In addition, there is a column for the index of each sloth
+beginning at 0 and ending at 4999 (which I removed later on).</p>
 <p>The link to the dataset can be found here: <a href="https://www.kaggle.com/datasets/bertiemackie/sloth-species" class="uri">https://www.kaggle.com/datasets/bertiemackie/sloth-species</a>
 .</p>
 <div id="description-of-each-attribute" class="section level2">
 <h2>Description of Each Attribute</h2>
 <ul>
+<li><code>x</code> : Index for each sloth</li>
 <li><code>claw_length_cm</code> : The claw length of a sloth in
 centimeters</li>
 <li><code>endangered</code> : The endangered category for the sub
@@ -518,6 +462,12 @@ cm</li>
 cm</li>
 <li><code>weight_kg</code> : The weight of the sloth in kg</li>
 </ul>
+</div>
+<div id="data-cleaning" class="section level2">
+<h2>Data Cleaning</h2>
+<pre class="r"><code>sloths &lt;- sloths %&gt;% 
+  clean_names() %&gt;%
+  select(-x) # removing the x column that contains the index for each sloth -&gt; was misleading since it started at 0</code></pre>
 </div>
 </div>
 

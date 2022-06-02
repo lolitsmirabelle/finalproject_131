@@ -36,7 +36,7 @@ Here are a few cute pictures of sloths!
 
 Let's begin by exploring the dataset and load all of the data and necessary packages.
 
-```{r}
+```{r, include=FALSE}
 # Loading packages
 library(tidymodels)
 library(ISLR) 
@@ -62,12 +62,13 @@ sloths <- read.csv("/Users/mirabellele/Desktop/finalproject_131/sloth_data.csv")
 head(sloths)
 ```
 
-In this data set, our dataset contains 4999 observations and 7 predictors.The dataset includes information on the sizes of sloths, with each row being a different observed sloth. The variables include the claw length, the endangered category for the sloth, what species the sloth is, what subspecies the sloth is, its size, tail length, and weight. 
+In this data set, our dataset contains 5000 observations and 7 predictors.The dataset includes information on the sizes of sloths, with each row being a different observed sloth. The variables include the claw length, the endangered category for the sloth, what species the sloth is, what subspecies the sloth is, its size, tail length, and weight. In addition, there is a column for the index of each sloth beginning at 0 and ending at 4999 (which I removed later on).
 
 The link to the dataset can be found here: https://www.kaggle.com/datasets/bertiemackie/sloth-species . 
 
 ## Description of Each Attribute
 
+* `x` : Index for each sloth
 * `claw_length_cm` : The claw length of a sloth in centimeters
 * `endangered` : The endangered category for the sub species
 * `size_cm` : The size of the sloth (head & body) in cm
@@ -75,3 +76,12 @@ The link to the dataset can be found here: https://www.kaggle.com/datasets/berti
 * `sub_specie` : The sub specie of sloth
 * `tail_length_cm` : The length of the sloths tail in cm
 * `weight_kg` : The weight of the sloth in kg
+
+## Data Cleaning
+
+```{r}
+sloths <- sloths %>% 
+  clean_names() %>%
+  select(-x) # removing the x column that contains the index for each sloth -> was misleading since it started at 0
+```
+

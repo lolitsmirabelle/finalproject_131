@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-The goal of this project is to generate a model that will predict if a sloth is two-toed or three-toed and look at their species.
+The goal of this project is to generate a model that will predict a sloth's species, seeing if a sloth is two-toed or three-toed.
 
 ## All Things Sloths!
 
@@ -87,7 +87,7 @@ sloths <- sloths %>%
   select(-x) 
 ```
 
-I ended up removing the x column that contains the index for each sloth since I thought it was misleading since it started at 0 and ended at 4999 I believed it was unnecessary to include in my data. 
+I ended up removing the `x` column that contains the index for each sloth since I thought it was misleading since it started at 0 and ended at 4999 I believed it was unnecessary to include in my data. 
 
 ```{r}
 # Factoring variables
@@ -132,7 +132,7 @@ sloths %>%
   ) 
 ```
 
-From the graph above, we can observe that the distribution of the sloth claw lengths closely follows a normal distribution.
+From the graph above, we can observe that the distribution of the sloth claw lengths closely follow a normal distribution.
 
 
 ```{r}
@@ -150,6 +150,20 @@ sloths %>%
 From the above graph, we can observe that the tail length of sloths in this dataset do not follow a normal distribution. It somewhat resembles a bimodel distribution. 
 
 ```{r}
+sloths %>% 
+  ggplot(aes(x = weight_kg)) +
+  geom_histogram(bins = 60) +
+  theme_bw() +
+  labs(
+    title = "Weight of Sloths",
+    x = "Weight (kg)",
+    y = "Count"
+  ) 
+```
+
+From the graph above, we can observe that the distribution of the weights of the sloths closely follow a normal distribution.
+
+```{r}
 ggplot(sloths, aes(endangered)) +
   geom_bar() +
   labs(
@@ -163,6 +177,14 @@ ggplot(sloths, aes(endangered)) +
 Here, we can see the different endangered statuses of sloths. We can see that a large majority of the observed sloths fall under the least concern status, which is good! There are a good amount of sloths that also fall under the vulnerable category, and a small amount of sloths fall under the critically endangered category.
 
 ```{r}
-
+ggplot(sloths, aes(x=size_cm, y=weight_kg)) + 
+    geom_point() 
 ```
+
+```{r}
+ggplot(sloths, aes(x=size_cm, y=tail_length_cm)) + 
+    geom_point() 
+```
+
+From the two above graphs, we find something very interesting! We can see that there are two clusters of data in both graphs when looking specifically at the different sizes of the sloths. 
 

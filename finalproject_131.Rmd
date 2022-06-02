@@ -74,14 +74,14 @@ The link to the dataset can be found here: https://www.kaggle.com/datasets/berti
 * `endangered` : The endangered category for the sub species
 * `size_cm` : The size of the sloth (head & body) in cm
 * `specie` : The species of sloth, two or three toed
-* `sub_specie` : The sub specie of sloth
+* `sub_specie` : The sub specie of sloth (Pygmy three-toed sloth, Hoffman’s two-toed sloth, Linnaeus’s two-toed sloth, Pale-throated sloth, Brown-throated sloth, Maned three-toed sloth)
 * `tail_length_cm` : The length of the sloths tail in cm
 * `weight_kg` : The weight of the sloth in kg
 
 # Data Cleaning
 
 ```{r}
-# cleaning and deselecting variables
+# Cleaning and deselecting variables
 sloths <- sloths %>% 
   clean_names() %>%
   select(-x) 
@@ -187,4 +187,52 @@ ggplot(sloths, aes(x=size_cm, y=tail_length_cm)) +
 ```
 
 From the two above graphs, we find something very interesting! We can see that there are two clusters of data in both graphs when looking specifically at the different sizes of the sloths. 
+
+Next, let's see how important the variable `specie` is to the rest of the data. This way, we'll be able to understand the value of the species of the sloth in relation to other variables.
+
+```{r}
+ggplot(sloths, aes(x=specie, y=size_cm, color = specie)) + 
+  geom_boxplot()
+```
+
+The above graph helps us understand the distribution of the data in the dataset in regards to sloth species. Here, we can see that three toed sloths are smaller than two toed sloths. We can also see that the range of the sizes of three toed sloths are much larger in comparison to the range of the sizes of two toed sloths. 
+
+```{r}
+ggplot(sloths, aes(x=specie, y=weight_kg, color = specie)) + 
+  geom_boxplot()
+```
+
+From the above graph, we can also see the distributions of the weights of different species of sloths. We can see that in general, three toed sloths do weigh less than two toed sloths. In addition, we can also see a couple of outliers of the data in regards to both three toed and two toed sloths.
+
+```{r}
+ggplot(sloths, aes(specie)) +
+  geom_bar() +
+  labs(
+    title = "Count of Different Sloth Species",
+    x = "Species",
+    y = "Count"
+  ) +
+  coord_flip()
+```
+
+```{r}
+sum(sloths$specie == "two_toed") # number of two-toed sloths
+sum(sloths$specie == "three_toed") # number of three-toed sloths
+
+sum(sloths$specie == "two_toed") / nrow(sloths) # proportion of two-toed
+sum(sloths$specie == "three_toed") / nrow(sloths) # proportion of three-toed
+```
+
+From the above graph, we can see the difference between the number of two-toed sloths and three-toed sloths. From our code, we gather that there are 2338 two-toed sloths and 2662 three-toed sloths within the data. From there, we can calculate the proportion of two-toed and three-toed sloths, 46.76% and 53.24%, respectively. 
+
+```{r}
+ggplot(sloths, aes(sub_specie)) +
+  geom_bar() +
+  labs(
+    title = "Count of Different Sloth Sub-Species",
+    x = "Sub-species",
+    y = "Count"
+  ) +
+  coord_flip()
+```
 

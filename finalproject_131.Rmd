@@ -27,12 +27,51 @@ Here are a few cute pictures of sloths!
 
 ![A little sloth hanging on a branch!](/Users/mirabellele/Desktop/finalproject_131/sloth3.jpeg)
 
-## Including Plots
+## Project Objectives
 
-You can also embed plots, for example:
+1. Clean the data and visualize the distribution of the features.
+2. Create a classification model to predict if a sloth is two toed or three toed.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+# Overview of Dataset
+
+Let's begin by exploring the dataset and load all of the data and necessary packages.
+
+```{r}
+# Loading packages
+library(tidymodels)
+library(ISLR) 
+library(ISLR2) 
+library(ggplot2)
+library(discrim)
+library(poissonreg)
+library(corrr)
+library(klaR) # for naive bayes
+tidymodels_prefer()
+library(rpart.plot)
+library(vip)
+library(janitor)
+library(randomForest)
+library(xgboost)
+library(ranger)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+# Loading the data
+sloths <- read.csv("/Users/mirabellele/Desktop/finalproject_131/sloth_data.csv") 
+head(sloths)
+```
+
+In this data set, our dataset contains 4999 observations and 7 predictors.The dataset includes information on the sizes of sloths, with each row being a different observed sloth. The variables include the claw length, the endangered category for the sloth, what species the sloth is, what subspecies the sloth is, its size, tail length, and weight. 
+
+The link to the dataset can be found here: https://www.kaggle.com/datasets/bertiemackie/sloth-species . 
+
+## Description of Each Attribute
+
+* `claw_length_cm` : The claw length of a sloth in centimeters
+* `endangered` : The endangered category for the sub species
+* `size_cm` : The size of the sloth (head & body) in cm
+* `specie` : The species of sloth, two or three toed
+* `sub_specie` : The sub specie of sloth
+* `tail_length_cm` : The length of the sloths tail in cm
+* `weight_kg` : The weight of the sloth in kg

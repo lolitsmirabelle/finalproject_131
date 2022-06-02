@@ -43,6 +43,7 @@ library(tidymodels)
 library(ISLR) 
 library(ISLR2) 
 library(ggplot2)
+library(corrplot)
 library(discrim)
 library(poissonreg)
 library(corrr)
@@ -236,3 +237,14 @@ ggplot(sloths, aes(sub_specie)) +
   coord_flip()
 ```
 
+Here, I've made a histogram displaying the count of different sub-species of sloths within the dataset. We can see all of the different types of sloths that make up the dataset!
+
+```{r}
+sloths_small <- sloths %>% 
+  select(size_cm, tail_length_cm, weight_kg)
+M = cor(sloths_small)
+
+corrplot(M, order = 'AOE', method = 'number')
+```
+
+Above is a correlation matrix to help show the positive and negative correlations that different variables within the dataset have with one another. We can see from the correlation matrix that `size_cm` and `weight_kg` have a positive relationship with one another. On the other hand, we also see that `weight_kg` and `tail_length_cm` have a negative relationship with each other as well as `tail_length_cm` and `size_cm`. 

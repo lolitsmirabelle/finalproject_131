@@ -11,13 +11,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+The goal of this project is to generate a model that will predict if a sloth is two-toed or three-toed and look at their species.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+## All Things Sloths!
 
-```{r cars}
-summary(cars)
-```
+If you don't know what sloths are, they are an adorable species of animals well known for being slow and lethargic. These creatures spend a majority of their lives hanging on trees, sleeping, and remaining hidden from predators. The animals live solitary lives and travel from tree to tree using canopy vines. Located in places such as Brazil and Panama, this strange and wonderful animal needs healthy forests to survive. 
 
 ## Including Plots
 

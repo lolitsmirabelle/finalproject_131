@@ -109,7 +109,7 @@ The data split was conducted prior to the EDA as I did not want to know anything
 set.seed(2424)
 
 sloths_split <- initial_split(sloths, prop = 0.80,
-                                strata = specie)
+                                strata = specie) # split on specie
 sloths_train <- training(sloths_split) # split sloths data into training & testing set
 sloths_test <- testing(sloths_split)
 ```
@@ -224,7 +224,7 @@ sum(sloths$specie == "two_toed") / nrow(sloths) # proportion of two-toed
 sum(sloths$specie == "three_toed") / nrow(sloths) # proportion of three-toed
 ```
 
-From the above graph, we can see the difference between the number of two-toed sloths and three-toed sloths. From our code, we gather that there are 2338 two-toed sloths and 2662 three-toed sloths within the data. From there, we can calculate the proportion of two-toed and three-toed sloths, 46.76% and 53.24%, respectively. 
+From the above graph, we can see the difference between the number of two-toed sloths and three-toed sloths. From our code, we gather that there are 2338 two-toed sloths and 2662 three-toed sloths within the data. We can then calculate the proportion of two-toed and three-toed sloths, 46.76% and 53.24%, respectively. 
 
 ```{r}
 ggplot(sloths, aes(sub_specie)) +
@@ -248,3 +248,109 @@ corrplot(M, order = 'AOE', method = 'number')
 ```
 
 Above is a correlation matrix to help show the positive and negative correlations that different variables within the dataset have with one another. We can see from the correlation matrix that `size_cm` and `weight_kg` have a positive relationship with one another. On the other hand, we also see that `weight_kg` and `tail_length_cm` have a negative relationship with each other as well as `tail_length_cm` and `size_cm`. 
+
+
+# Model Building 
+
+The whole model building process was quite long and took me a bit but this is how I approached it:
+
+1. Building the model
+2. Running the model
+3. Analyzing the model
+
+### Making My Recipe
+
+```{r}
+sloths_recipe <- 
+  recipe(specie ~ ., data = sloths_train%>%select(-c(sub_specie, endangered))) %>% 
+  step_dummy(all_nominal_predictors()) %>%
+  step_center(all_predictors()) %>%
+  step_scale(all_predictors())
+```
+
+Above, I made my recipe to help predict `specie` with all nominal predictors except `sub_specie` and `endangered` since they were categorical variables. 
+
+### Looking at Logistic Regresssion, LDA, and QDA Models
+
+```{r}
+sloths_folds <- vfold_cv(sloths_train, v = 10, repeats=2)
+```
+
+Here, I folded my training data into 10 folds with 2 repeats.
+
+```{r}
+# logistic regression model
+log_reg <- logistic_reg() %>% 
+  set_engine("glm") %>% 
+  set_mode("classification")
+log_wkflow <- workflow() %>% 
+  add_model(log_reg) %>% 
+  add_recipe(sloths_recipe)
+
+# lda model
+lda_mod <- discrim_linear() %>% 
+  set_mode("classification") %>% 
+  set_engine("MASS")
+lda_wkflow <- workflow() %>% 
+  add_model(lda_mod) %>% 
+  add_recipe(sloths_recipe)
+
+# qda model 
+qda_mod <- discrim_quad() %>% 
+  set_mode("classification") %>% 
+  set_engine("MASS")
+qda_wkflow <- workflow() %>% 
+  add_model(qda_mod) %>% 
+  add_recipe(sloths_recipe)
+```
+
+Afterwards, I set up the model and workflows for the logistic regression model, linear discriminant analysis model, and quadratic discriminant analysis model.
+
+```{r, eval=FALSE}
+log_fit_rs <- log_wkflow %>% fit_resamples(sloths_folds)
+lda_fit_rs <- lda_wkflow %>% fit_resamples(sloths_folds)
+qda_fit_rs <- qda_wkflow %>% fit_resamples(sloths_folds)
+```
+
+```{r}
+load("fitmodels.rda")
+```
+
+Next, I fit the models to the folded data. I also decided to run the code once, using an R script, and stored my results, using loading and saving, but set eval = FALSE in the code chunks. This was so I wouldn't have to run it every time I knitted the file. 
+
+```{r}
+collect_metrics(log_fit_rs)
+collect_metrics(lda_fit_rs)
+collect_metrics(qda_fit_rs)
+```
+
+Here, I used collect_metrics() to print the accuracy and ROC AUC of the performance metric accuracy across all folds for each of the models. From the above, we can see that the linear discriminant analysis model had the highest accuracy with an accuracy of 97.45%. 
+
+```{r}
+log_model_fit <- log_wkflow %>% fit(sloths_train)
+```
+
+Here, I fit the logistic regression model to the entire training dataset to analyze the performance of the training data.
+
+```{r}
+log_test_acc <- predict(log_model_fit, new_data = sloths_test)%>%
+  bind_cols(sloths_test%>%dplyr::select(specie))%>%
+  accuracy(truth = specie, estimate = .pred_class)
+log_test_acc
+```
+
+Finally, with my fitted model, I used predict(), bind_cols(), and accuracy() to assess my model’s performance on the testing data. From the above, we can see that the testing data had an accuracy of 97.20%. For logistic regression, the model actually performed better in terms of accuracy on the testing set than it did on the training set. This can happen sometimes, and is likely because this is not a difficult prediction problem – and, in this case, possibly because the assumptions of logistic regression are met.
+
+
+# Preparing & Running The Models for Repeated Cross Validation
+I decided to run repeated cross fold validation on the following three models due to the large number of categorical variables in my data set.
+* Random Forest
+* Boosted Trees
+* Nearest Neighbors
+
+### Random Forest Model
+
+```{r}
+
+```
+

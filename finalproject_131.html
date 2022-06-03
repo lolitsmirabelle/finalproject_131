@@ -494,7 +494,7 @@ those observations.</p>
 <pre class="r"><code>set.seed(2424)
 
 sloths_split &lt;- initial_split(sloths, prop = 0.80,
-                                strata = specie)
+                                strata = specie) # split on specie
 sloths_train &lt;- training(sloths_split) # split sloths data into training &amp; testing set
 sloths_test &lt;- testing(sloths_split)</code></pre>
 <p>The training data contains 3999 observations and the testing data
@@ -605,8 +605,8 @@ toed and two toed sloths.</p>
 <p>From the above graph, we can see the difference between the number of
 two-toed sloths and three-toed sloths. From our code, we gather that
 there are 2338 two-toed sloths and 2662 three-toed sloths within the
-data. From there, we can calculate the proportion of two-toed and
-three-toed sloths, 46.76% and 53.24%, respectively.</p>
+data. We can then calculate the proportion of two-toed and three-toed
+sloths, 46.76% and 53.24%, respectively.</p>
 <pre class="r"><code>ggplot(sloths, aes(sub_specie)) +
   geom_bar() +
   labs(
@@ -633,6 +633,117 @@ relationship with one another. On the other hand, we also see that
 <code>weight_kg</code> and <code>tail_length_cm</code> have a negative
 relationship with each other as well as <code>tail_length_cm</code> and
 <code>size_cm</code>.</p>
+</div>
+</div>
+<div id="model-building" class="section level1">
+<h1>Model Building</h1>
+<p>The whole model building process was quite long and took me a bit but
+this is how I approached it:</p>
+<ol style="list-style-type: decimal">
+<li>Building the model</li>
+<li>Running the model</li>
+<li>Analyzing the model</li>
+</ol>
+<div id="making-my-recipe" class="section level3">
+<h3>Making My Recipe</h3>
+<pre class="r"><code>sloths_recipe &lt;- 
+  recipe(specie ~ ., data = sloths_train%&gt;%select(-c(sub_specie, endangered))) %&gt;% 
+  step_dummy(all_nominal_predictors()) %&gt;%
+  step_center(all_predictors()) %&gt;%
+  step_scale(all_predictors())</code></pre>
+<p>Above, I made my recipe to help predict <code>specie</code> with all
+nominal predictors except <code>sub_specie</code> and
+<code>endangered</code> since they were categorical variables.</p>
+</div>
+<div id="looking-at-logistic-regresssion-lda-and-qda-models" class="section level3">
+<h3>Looking at Logistic Regresssion, LDA, and QDA Models</h3>
+<pre class="r"><code>sloths_folds &lt;- vfold_cv(sloths_train, v = 10, repeats=2)</code></pre>
+<p>Here, I folded my training data into 10 folds with 2 repeats.</p>
+<pre class="r"><code># logistic regression model
+log_reg &lt;- logistic_reg() %&gt;% 
+  set_engine(&quot;glm&quot;) %&gt;% 
+  set_mode(&quot;classification&quot;)
+log_wkflow &lt;- workflow() %&gt;% 
+  add_model(log_reg) %&gt;% 
+  add_recipe(sloths_recipe)
+
+# lda model
+lda_mod &lt;- discrim_linear() %&gt;% 
+  set_mode(&quot;classification&quot;) %&gt;% 
+  set_engine(&quot;MASS&quot;)
+lda_wkflow &lt;- workflow() %&gt;% 
+  add_model(lda_mod) %&gt;% 
+  add_recipe(sloths_recipe)
+
+# qda model 
+qda_mod &lt;- discrim_quad() %&gt;% 
+  set_mode(&quot;classification&quot;) %&gt;% 
+  set_engine(&quot;MASS&quot;)
+qda_wkflow &lt;- workflow() %&gt;% 
+  add_model(qda_mod) %&gt;% 
+  add_recipe(sloths_recipe)</code></pre>
+<p>Afterwards, I set up the model and workflows for the logistic
+regression model, linear discriminant analysis model, and quadratic
+discriminant analysis model.</p>
+<pre class="r"><code>log_fit_rs &lt;- log_wkflow %&gt;% fit_resamples(sloths_folds)
+lda_fit_rs &lt;- lda_wkflow %&gt;% fit_resamples(sloths_folds)
+qda_fit_rs &lt;- qda_wkflow %&gt;% fit_resamples(sloths_folds)</code></pre>
+<pre class="r"><code>load(&quot;fitmodels.rda&quot;)</code></pre>
+<p>Next, I fit the models to the folded data. I also decided to run the
+code once, using an R script, and stored my results, using loading and
+saving, but set eval = FALSE in the code chunks. This was so I wouldn’t
+have to run it every time I knitted the file.</p>
+<pre class="r"><code>collect_metrics(log_fit_rs)</code></pre>
+<pre><code>## # A tibble: 2 × 6
+##   .metric  .estimator  mean     n  std_err .config             
+##   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
+## 1 accuracy binary     0.974    20 0.00161  Preprocessor1_Model1
+## 2 roc_auc  binary     0.997    20 0.000400 Preprocessor1_Model1</code></pre>
+<pre class="r"><code>collect_metrics(lda_fit_rs)</code></pre>
+<pre><code>## # A tibble: 2 × 6
+##   .metric  .estimator  mean     n  std_err .config             
+##   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
+## 1 accuracy binary     0.974    20 0.00179  Preprocessor1_Model1
+## 2 roc_auc  binary     0.997    20 0.000392 Preprocessor1_Model1</code></pre>
+<pre class="r"><code>collect_metrics(qda_fit_rs)</code></pre>
+<pre><code>## # A tibble: 2 × 6
+##   .metric  .estimator  mean     n  std_err .config             
+##   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
+## 1 accuracy binary     0.973    20 0.00147  Preprocessor1_Model1
+## 2 roc_auc  binary     0.997    20 0.000415 Preprocessor1_Model1</code></pre>
+<p>Here, I used collect_metrics() to print the accuracy and ROC AUC of
+the performance metric accuracy across all folds for each of the models.
+From the above, we can see that the linear discriminant analysis model
+had the highest accuracy with an accuracy of 97.45%.</p>
+<pre class="r"><code>log_model_fit &lt;- log_wkflow %&gt;% fit(sloths_train)</code></pre>
+<p>Here, I fit the logistic regression model to the entire training
+dataset to analyze the performance of the training data.</p>
+<pre class="r"><code>log_test_acc &lt;- predict(log_model_fit, new_data = sloths_test)%&gt;%
+  bind_cols(sloths_test%&gt;%dplyr::select(specie))%&gt;%
+  accuracy(truth = specie, estimate = .pred_class)
+log_test_acc</code></pre>
+<pre><code>## # A tibble: 1 × 3
+##   .metric  .estimator .estimate
+##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+## 1 accuracy binary         0.972</code></pre>
+<p>Finally, with my fitted model, I used predict(), bind_cols(), and
+accuracy() to assess my model’s performance on the testing data. From
+the above, we can see that the testing data had an accuracy of 97.20%.
+For logistic regression, the model actually performed better in terms of
+accuracy on the testing set than it did on the training set. This can
+happen sometimes, and is likely because this is not a difficult
+prediction problem – and, in this case, possibly because the assumptions
+of logistic regression are met.</p>
+</div>
+</div>
+<div id="preparing-running-the-models-for-repeated-cross-validation" class="section level1">
+<h1>Preparing &amp; Running The Models for Repeated Cross
+Validation</h1>
+<p>I decided to run repeated cross fold validation on the following
+three models due to the large number of categorical variables in my data
+set. * Random Forest * Boosted Trees * Nearest Neighbors</p>
+<div id="random-forest-model" class="section level3">
+<h3>Random Forest Model</h3>
 </div>
 </div>
 

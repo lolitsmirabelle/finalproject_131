@@ -344,6 +344,7 @@ Finally, with my fitted model, I used predict(), bind_cols(), and accuracy() to 
 
 # Preparing & Running The Models for Repeated Cross Validation
 I decided to run repeated cross fold validation on the following three models due to the large number of categorical variables in my data set.
+
 * Random Forest
 * Boosted Trees
 * Nearest Neighbors

@@ -55,6 +55,8 @@ library(janitor)
 library(randomForest)
 library(xgboost)
 library(ranger)
+library(kknn)
+library(kknn)
 ```
 
 
@@ -352,6 +354,175 @@ I decided to run repeated cross fold validation on the following three models du
 ### Random Forest Model
 
 ```{r}
+rf_model <- 
+  rand_forest(
+              min_n = tune(),
+              mtry = tune(),
+              mode = "classification") %>% 
+  set_engine("ranger")
 
+rf_workflow <- workflow() %>% 
+  add_model(rf_model) %>% 
+  add_recipe(sloths_recipe)
 ```
+
+
+
+```{r}
+rf_params <- parameters(rf_model) %>% 
+  update(mtry = mtry(range= c(1, 4)))
+
+rf_grid <- grid_regular(rf_params, levels = 2)
+```
+
+
+
+```{r,eval=FALSE}
+rf_tune <- rf_workflow %>% 
+  tune_grid(
+    resamples = sloths_folds, 
+    grid = rf_grid)
+
+# Write Out Results & Workflow ----
+save(rf_tune, rf_workflow, file = "rf_tune.rda")
+```
+
+
+
+
+### Boosted Tree Model
+
+
+```{r}
+bt_model <- boost_tree(mode = "classification",
+                       min_n = tune(),
+                       mtry = tune(),
+                       learn_rate = tune()) %>% 
+  set_engine("xgboost")
+
+bt_workflow <- workflow() %>% 
+  add_model(bt_model) %>% 
+  add_recipe(sloths_recipe)
+```
+
+
+
+```{r}
+bt_params <- parameters(bt_model) %>% 
+  update(mtry = mtry(range= c(1, 4)),
+         learn_rate = learn_rate(range = c(-5, 0.2))
+  )
+
+# define grid
+bt_grid <- grid_regular(bt_params, levels = 2)
+```
+
+
+
+```{r,eval=FALSE}
+bt_tune <- bt_workflow %>% 
+  tune_grid(
+    resamples = sloths_folds, 
+    grid = bt_grid
+    )
+
+# Write Out Results & Workflow ----
+save(bt_tune, bt_workflow, file = "bt_tune.rda")
+```
+
+
+
+### Nearest Neighbors Model 
+
+
+
+```{r}
+knn_model <- 
+  nearest_neighbor(
+    neighbors = tune(),
+    mode = "classification") %>% 
+  set_engine("kknn")
+
+knn_workflow <- workflow() %>% 
+  add_model(knn_model) %>% 
+  add_recipe(sloths_recipe)
+```
+
+
+
+```{r}
+# set-up tuning grid ----
+knn_params <- parameters(knn_model)
+
+
+# define grid
+knn_grid <- grid_regular(knn_params, levels = 2)
+```
+
+
+
+```{r,eval=FALSE}
+knn_tune <- knn_workflow %>% 
+  tune_grid(
+    resamples = sloths_folds, 
+            grid = knn_grid)
+
+save(knn_tune, knn_workflow, file = "knn_tune.rda")
+```
+
+
+
+## Model Analysis
+
+```{r}
+load("bt_tune.rda")
+load("rf_tune.rda")
+load("knn_tune.rda")
+```
+
+
+
+```{r}
+autoplot(rf_tune, metric = "roc_auc")
+```
+
+
+
+```{r}
+show_best(rf_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
+```
+
+
+
+```{r}
+autoplot(bt_tune, metric = "roc_auc")
+```
+
+
+
+```{r}
+show_best(bt_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
+```
+
+
+
+```{r}
+autoplot(knn_tune, metric = "roc_auc")
+```
+
+
+
+```{r}
+show_best(knn_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
+```
+
+
+
+
+
+
+
+
+
+
 

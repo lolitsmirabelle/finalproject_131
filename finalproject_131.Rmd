@@ -189,7 +189,7 @@ ggplot(sloths, aes(x=size_cm, y=tail_length_cm)) +
     geom_point() 
 ```
 
-From the two above graphs, we find something very interesting! We can see that there are two clusters of data in both graphs when looking specifically at the different sizes of the sloths. 
+From the two above graphs, we find something very interesting! We can see that there are two clusters of data in both graphs when looking specifically at the different sizes of the sloths. I hypothesize that these two clusters represent the two different types of sloths (two-toed and three-toed).
 
 Next, let's see how important the variable `specie` is to the rest of the data. This way, we'll be able to understand the value of the species of the sloth in relation to other variables.
 
@@ -198,14 +198,14 @@ ggplot(sloths, aes(x=specie, y=size_cm, color = specie)) +
   geom_boxplot()
 ```
 
-The above graph helps us understand the distribution of the data in the dataset in regards to sloth species. Here, we can see that three toed sloths are smaller than two toed sloths. We can also see that the range of the sizes of three toed sloths are much larger in comparison to the range of the sizes of two toed sloths. 
+The above graph helps us understand the distribution of the data in the dataset in regards to sloth species. Here, we can see that three toed sloths are smaller than two toed sloths. We can also see that the range of the sizes of three toed sloths are much larger in comparison to the range of the sizes of two toed sloths. This makes sense as upon doing some research, two-toed sloths are actually larger than three-toed sloths!
 
 ```{r}
 ggplot(sloths, aes(x=specie, y=weight_kg, color = specie)) + 
   geom_boxplot()
 ```
 
-From the above graph, we can also see the distributions of the weights of different species of sloths. We can see that in general, three toed sloths do weigh less than two toed sloths. In addition, we can also see a couple of outliers of the data in regards to both three toed and two toed sloths.
+From the above graph, we can also see the distributions of the weights of different species of sloths. We can see that in general, three toed sloths do weigh less than two toed sloths. In addition, we can also see a couple of outliers of the data in regards to both three toed and two toed sloths. This makes sense as upon doing some research, two-toed sloths are actually larger than three-toed sloths and would weigh more!
 
 ```{r}
 ggplot(sloths, aes(specie)) +
@@ -249,7 +249,7 @@ M = cor(sloths_small)
 corrplot(M, order = 'AOE', method = 'number')
 ```
 
-Above is a correlation matrix to help show the positive and negative correlations that different variables within the dataset have with one another. We can see from the correlation matrix that `size_cm` and `weight_kg` have a positive relationship with one another. On the other hand, we also see that `weight_kg` and `tail_length_cm` have a negative relationship with each other as well as `tail_length_cm` and `size_cm`. 
+Above is a correlation matrix to help show the positive and negative correlations that different variables within the dataset have with one another. We can see from the correlation matrix that `size_cm` and `weight_kg` have a positive relationship with one another. This makes sense because as the size of the sloth increases, its weight should also increase! On the other hand, we also see that `weight_kg` and `tail_length_cm` have a negative relationship with each other as well as `tail_length_cm` and `size_cm`. We can conclude that as a sloth increases in weight or size, its tail length will decrease. Upon doing some research, two-toed sloths are in fact bigger than three-toed sloths and have shorter tails, so the data makes sense!
 
 
 # Model Building 
@@ -353,6 +353,8 @@ I decided to run repeated cross fold validation on the following three models du
 
 ### Random Forest Model
 
+First, I set up the model and workflow. Here, I tuned min_n and mtry, set mode to "classification" (because my outcome is a categorical variable), and used the ranger engine. I stored this model and my recipe in a workflow.
+
 ```{r}
 rf_model <- 
   rand_forest(
@@ -366,7 +368,7 @@ rf_workflow <- workflow() %>%
   add_recipe(sloths_recipe)
 ```
 
-
+Next, I set up the tuning grid, and I updated the parameters to range from 1 to 4 and set up a tuning grid with 2 levels.
 
 ```{r}
 rf_params <- parameters(rf_model) %>% 
@@ -375,7 +377,7 @@ rf_params <- parameters(rf_model) %>%
 rf_grid <- grid_regular(rf_params, levels = 2)
 ```
 
-
+Then, I executed my model by tuning and fitting. I wrote out the results and the workflow so I would not need to run it again:
 
 ```{r,eval=FALSE}
 rf_tune <- rf_workflow %>% 
@@ -388,10 +390,9 @@ save(rf_tune, rf_workflow, file = "rf_tune.rda")
 ```
 
 
-
-
 ### Boosted Tree Model
 
+In a similar process, I set the model with tuning parameters min_n, mtry, and learn_rate . I set the engine as xgboost. I created a workflow.
 
 ```{r}
 bt_model <- boost_tree(mode = "classification",
@@ -405,7 +406,7 @@ bt_workflow <- workflow() %>%
   add_recipe(sloths_recipe)
 ```
 
-
+Then, I set up a tuning grid, and used the same parameters as above.
 
 ```{r}
 bt_params <- parameters(bt_model) %>% 
@@ -417,7 +418,7 @@ bt_params <- parameters(bt_model) %>%
 bt_grid <- grid_regular(bt_params, levels = 2)
 ```
 
-
+Then, I executed the model by tuning and fitting. I saved the results and the workflow so I would not need to run that code chunk again.
 
 ```{r,eval=FALSE}
 bt_tune <- bt_workflow %>% 
@@ -431,10 +432,9 @@ save(bt_tune, bt_workflow, file = "bt_tune.rda")
 ```
 
 
-
 ### Nearest Neighbors Model 
 
-
+Lastly, I ran repeated cross fold validation on the Nearest Neighbor model similarly to the previous two models. For nearest neighbor, I tuned only neighbors as the model’s other defaults are fine. I also set the workflow and added the recipe.
 
 ```{r}
 knn_model <- 
@@ -448,7 +448,7 @@ knn_workflow <- workflow() %>%
   add_recipe(sloths_recipe)
 ```
 
-
+Next, I set up a tuning grid and defined it.
 
 ```{r}
 # set-up tuning grid ----
@@ -459,6 +459,7 @@ knn_params <- parameters(knn_model)
 knn_grid <- grid_regular(knn_params, levels = 2)
 ```
 
+Then I tuned and fit the repeated cross fold validation. Like before, I wrote out the results and workflow so I could access them later without having to refit the model.
 
 
 ```{r,eval=FALSE}
@@ -471,8 +472,9 @@ save(knn_tune, knn_workflow, file = "knn_tune.rda")
 ```
 
 
-
 ## Model Analysis
+
+With each of the three cross validation model R scripts, complete and written out to a file, I loaded the results into my R environment.
 
 ```{r}
 load("bt_tune.rda")
@@ -480,31 +482,33 @@ load("rf_tune.rda")
 load("knn_tune.rda")
 ```
 
-
+### Random Forest Model
 
 ```{r}
 autoplot(rf_tune, metric = "roc_auc")
 ```
 
-
+Looking at the `autoplot()` function, we can see that `roc_auc` decreases as the number of randomly selected predictors increases.
 
 ```{r}
 show_best(rf_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
 ```
 
+Using the show_best() function, the biggest mean is 0.9962436	, with mtry = 1 and min_n = 2. This is pretty good, because it means that the model's predictions were 99.62% correct!
 
+### Boosted Tree Model
 
 ```{r}
 autoplot(bt_tune, metric = "roc_auc")
 ```
 
-
-
 ```{r}
 show_best(bt_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
 ```
 
+Using the show_best() function, the highest mean is 0.9945630, with learn_rate = 1.58, mtry = 4, and min_n = 40. This means that the model's predictions were about 99.46% correct!
 
+### Nearest Neighbors Model
 
 ```{r}
 autoplot(knn_tune, metric = "roc_auc")
@@ -516,13 +520,74 @@ autoplot(knn_tune, metric = "roc_auc")
 show_best(knn_tune, metric = "roc_auc") %>% select(-.estimator, -.config)
 ```
 
+Using the show_best() function, the highest mean is 0.9945245, with neighbors = 15. This does not beat our random forest model.
+
+We will now continue with the Random Forest Model being the model that performed the best. 
 
 
+## Final Model Building
+
+We’ll create a workflow that has tuned in the name, so we can identify it. We’ll finalize the workflow by taking the parameters from the best model (the random forest model) using the `select_best()` function.
+
+```{r}
+rf_workflow_tuned <- rf_workflow %>% 
+  finalize_workflow(select_best(rf_tune, metric = "roc_auc"))
+```
+
+Next, we run the fit!
+
+```{r}
+rf_results <- fit(rf_workflow_tuned, sloths_train)
+```
 
 
+## Analysis of the Testing Set
+
+```{r}
+rf_test_acc <- predict(rf_results, new_data = sloths_test)%>%
+  bind_cols(sloths_test%>%dplyr::select(specie))%>%
+  accuracy(truth = specie, estimate = .pred_class)
+
+rf_test_acc
+```
+
+Our model returned an accuracy of 0.97003 on our testing data, which means that 97.003% of our testing data is accurate. 
+
+```{r}
+rf_train_acc <- predict(rf_results, new_data = sloths_train)%>%
+  bind_cols(sloths_train%>%dplyr::select(specie))%>%
+  accuracy(truth = specie, estimate = .pred_class)
+
+rf_train_acc
+```
+
+From evaluating the accuracy of our training data, we receive that it is 100% accurate. Unfortunately, by looking at the accuracy of the training and testing data on the random forest model, we see that our model did not do such a great job as it overfitted to the training data.This means that the noise or random fluctuations in the training data were picked up and learned as concepts by the model. The problem is that these concepts do not apply to new data and negatively impact the models ability to generalize.
 
 
+# Conclusion 
+
+This section summarizes our project and highlights several key findings. Our goal waas to use machine learning models on a dataset of sloths to predict a species of sloth.
+
+We achieved this in two parts (objectives):
+
+1. Clean the data and visualize the distribution of the features.
+2. Create a classification model to predict if a sloth is two toed or three toed.
 
 
+## Models
+
+We ended up making 6 classification models: Logistic Regression, LDA, QDA, Random Forest, Boosted Tree, and Nearest Neighbors.
+
+We used a 80% train and 20% test set split for our classification models.
 
 
+## Our Best Fitting Model
+
+Our best fitting model at predicting sloth species ended up being the Random Forest model. The Random Forest model provides higher accuracy through cross validation. Although our model ended up overfitting to the training data, we can learn from this! Decision trees are a nonparametric machine learning algorithm that is very flexible and is subject to overfitting training data. This problem can be addressed by pruning a tree after it has learned in order to remove some of the detail it has picked up.
+
+## Overall Key Findings
+
+* The distribution of the sloth claw lengths and sloth weight closely follow a normal distribution.
+* The tail length of sloths in this dataset do not follow a normal distribution and actually resembles a bimodel distribution. 
+* Two-toed sloths are larger in size and heavier in weight in comparison to three-toed sloths.
+* The variables `size_cm` and `weight_kg` have a positive relationship with one another. On the other hand, we also saw that `weight_kg` and `tail_length_cm` have a negative relationship with each other as well as `tail_length_cm` and `size_cm`. 

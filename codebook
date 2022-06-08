@@ -1,0 +1,12 @@
+Sloths Codebook
+
+Description of Each Attribute
+
+* `x` : Index for each sloth
+* `claw_length_cm` : The claw length of a sloth in centimeters
+* `endangered` : The endangered category for the sub species
+* `size_cm` : The size of the sloth (head & body) in cm
+* `specie` : The species of sloth (two or three toed)
+* `sub_specie` : The sub specie of sloth (Pygmy three-toed sloth, Hoffman’s two-toed sloth, Linnaeus’s two-toed sloth, Pale-throated sloth, Brown-throated sloth, Maned three-toed sloth)
+* `tail_length_cm` : The length of the sloths tail in cm
+* `weight_kg` : The weight of the sloth in kg
